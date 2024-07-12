@@ -1,0 +1,22 @@
+{
+    "Author": "Elena",
+    "Name": "XIV Chat Bridge",
+    "InternalName": "XIVChatBridge",
+    "AssemblyVersion": "1.0.0.0",
+    "Description": "Chat bridge to access ingame chat from your browser while the game is running.",
+    "ApplicableVersion": "any",
+    "RepoUrl": "https://github.com/theswiftfox/xivchatbridge",
+    "Tags": [
+        "chat",
+        "plugin"
+    ],
+    "DalamudApiLevel": 10,
+    "LoadRequiredState": 0,
+    "LoadSync": false,
+    "CanUnloadAsync": false,
+    "LoadPriority": 0,
+    "Punchline": "Chat bridge for XIV Chat",
+    "AcceptsFeedback": true,
+    "DownloadLinkInstall": "https://github.com/theswiftfox/xivchatbridge/releases/download/1.0.0/xivchatbridge.zip",
+    "DownloadLinkUpdate": "https://github.com/theswiftfox/xivchatbridge/releases/download/1.0.0/xivchatbridge.zip"
+}
