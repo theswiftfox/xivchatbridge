@@ -2,3 +2,5 @@
 obj/
 bin/
 *.user
+target/
+dist/

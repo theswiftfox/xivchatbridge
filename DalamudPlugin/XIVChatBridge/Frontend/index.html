@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width">
+
+  <title>XIV Chat</title>
+  <link rel="stylesheet" href="/index-a37a45b366b72be.css" integrity="sha384&#x2D;1IZZsfQEAZRNTW4Gt3LVTiRq2Hzs1W1ktvHUpR0coMSCc5axEJ3YVAf8dr7mN63R"/>
+  
+<script type="module" nonce="HiLcPry5K8w3sonkCuMjFQ==">
+import init, * as bindings from '/XIVChatBridgeFrontend-1ac8d0cebe22b2a6.js';
+const wasm = await init('/XIVChatBridgeFrontend-1ac8d0cebe22b2a6_bg.wasm');
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script>
+
+<link rel="modulepreload" href="/XIVChatBridgeFrontend-1ac8d0cebe22b2a6.js" crossorigin=anonymous integrity="sha384-gJuOsGg6r7KQyS2fGihWUs5Wfz3jBrONsHDGrPOePGdAex2t8bKKvnfMAULkWKG9">
+<link rel="modulepreload" href="/snippets/wasm-streams-42e57edbcd526312/inline0.js" crossorigin=anonymous integrity="sha384-ds/vG7aZ9F2C8Y6Z0hkkZruEmlqVhVaPDahyWByFSiZaddaa439KtHi5jJu/pXTv">
+<link rel="preload" href="/XIVChatBridgeFrontend-1ac8d0cebe22b2a6_bg.wasm" crossorigin=anonymous integrity="sha384-GNspY2J1feBlP9aqivuNH3QGW0jxH+0WYg79VPMmUZq72Zbeylh9xeYcfaaKP/kE" as="fetch" type="application/wasm"></head>
+
+<body></body>
+
+</html>

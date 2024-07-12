@@ -1,0 +1,30 @@
+[package]
+name = "XIVChatBridgeFrontend"
+version = "0.1.0"
+edition = "2021"
+description = "Frontend for XIVChatBRidge"
+readme = "README.md"
+repository = "https://github.com/theswiftfox/xivchat"
+license = "MIT OR Apache-2.0"
+keywords = ["yew", "trunk"]
+categories = ["gui", "wasm", "web-programming"]
+publish = false
+authors = ["Elena Gantner <elena.gantner@gmail.com>"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[dependencies]
+chrono = { version = "0.4", default-features = false, features = ["std"] }
+lazy_static = "1.4"
+log = "0.4"
+reqwest-wasm = { version = "0.11", default-features = false, features = [
+    "native-tls",
+    "json",
+    "stream",
+] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1"
+web-sys = { version = "0.3", features = ["Location", "HtmlFormElement"] }
+wasm-bindgen = "0.2"
+wasm-logger = "0.2"
+wasmtimer = "0.2"
+yew = { version = "0.20", features = ["csr"] }

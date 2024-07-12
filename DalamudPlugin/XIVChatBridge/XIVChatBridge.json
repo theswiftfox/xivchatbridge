@@ -1,0 +1,11 @@
+{
+  "Author": "Elena",
+  "Name": "XIV Chat Bridge",
+  "Punchline": "Chat bridge for XIV Chat",
+  "Description": "A description that shows up in /xlplugins. List any major slash-command(s).",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "chat",
+    "plugin"
+  ]
+}

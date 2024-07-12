@@ -1,16 +1,17 @@
-﻿using Dalamud.Configuration;
+using Dalamud.Configuration;
 using Dalamud.Plugin;
 using System;
 
-namespace SamplePlugin;
+namespace XIVChatBridge;
 
 [Serializable]
 public class Configuration : IPluginConfiguration
 {
-    public int Version { get; set; } = 0;
+    public int Version { get; set; } = 1;
 
-    public bool IsConfigWindowMovable { get; set; } = true;
-    public bool SomePropertyToBeSavedAndWithADefault { get; set; } = true;
+    public int Port { get; set; } = 9876;
+
+    public bool AllowNonLocalAccess = false;
 
     // the below exist just to make saving less cumbersome
     public void Save()
