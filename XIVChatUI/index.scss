@@ -65,30 +65,34 @@ div.chatBox {
     flex-direction: column-reverse;
 
     >div.chatEntry {
-      display: flex;
-      flex-direction: row;
+      display: block;
+      // flex-direction: row;
 
       >div.timestamp {
         color: #FFFFFFFF;
         min-width: fit-content;
         margin-right: 0.25rem;
-        flex: 0;
+        // flex: 0;
+        float: inline-start;
       }
 
       >div.chatType {
         min-width: fit-content;
         margin-right: 0.25rem;
-        flex: 0;
+        // flex: 0;
+        float: inline-start;
       }
 
       >div.sender {
         min-width: fit-content;
         margin-right: 0.5rem;
-        flex: 0;
+        // flex: 0;
+        float: inline-start;
       }
 
-      >div.chatMessage {
-        flex-grow: 1;
+      >span.chatMessage {
+        // flex-grow: 1;
+        word-wrap: break-word;
       }
     }
   }

@@ -5,7 +5,7 @@ const REFRESH_TIME_SEC: u64 = 3;
 use models::{ChatMessage, NewMessageRequest};
 use requests::{get_messages, send_message};
 use wasm_bindgen::JsCast;
-use web_sys::{FormData, HtmlFormElement};
+use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
 
 pub enum FetchState<T, E> {
@@ -78,7 +78,12 @@ impl Component for App {
                                     let data = FormData::new_with_form(&form)
                                         .map_err(|e| e.as_string().unwrap_or_default())
                                         .and_then(|form_data| form_data.try_into());
-                                    form.reset();
+                                    if let Some(input) = web_sys::window()
+                                        .and_then(|w| w.document())
+                                        .and_then(|doc| doc.get_element_by_id("text"))
+                                        .and_then(|elem| elem.dyn_into::<HtmlInputElement>().ok()) {
+                                            input.set_value("");
+                                        }
                                     data
                                 } else {
                                     Err("unable to get form reference".to_owned())
@@ -214,13 +219,14 @@ impl Component for ChatBoxComponent {
                                     .map(|msg| {
                                         let color = msg.chat_type.get_color();
                                         let uniq = format!("{}_{}", msg.timestamp, msg.sender_name);
+                                        // todo: wrap message to next line. probably have div as float with wrapping and text set to fit content or smth?
                                         html!{
                                             <>
                                                 <div key={uniq} class="chatEntry">
                                                     <div class="timestamp"> { format!("[{}]", msg.formatted_timestamp()) } </div>
                                                     <div class="chatType" style= { format!("color: {color}") }> { format!("[{}]", msg.chat_type) } </div>
                                                     if !msg.sender_name.is_empty() { <div class="sender" style= { format!("color: {color}") }> { format!("{}:", msg.sender_name) } </div> }
-                                                    <div class="chatMessage" style= { format!("color: {color}") }>{ format!("{text}", text = msg.text) } </div>
+                                                    <span class="chatMessage" style= { format!("color: {color}") }>{ format!("{text}", text = msg.text) } </span>
                                                 </div>
                                             </>
                                         }
@@ -265,13 +271,21 @@ pub mod models {
         FreeCompany,
         Alliance,
         CrossParty,
+        #[serde(rename = "ls1")]
         LinkShell1,
+        #[serde(rename = "ls2")]
         LinkShell2,
+        #[serde(rename = "ls3")]
         LinkShell3,
+        #[serde(rename = "ls4")]
         LinkShell4,
+        #[serde(rename = "ls5")]
         LinkShell5,
+        #[serde(rename = "ls6")]
         LinkShell6,
+        #[serde(rename = "ls7")]
         LinkShell7,
+        #[serde(rename = "ls8")]
         LinkShell8,
         CrossLinkShell1,
         CrossLinkShell2,
@@ -281,15 +295,16 @@ pub mod models {
         CrossLinkShell6,
         CrossLinkShell7,
         CrossLinkShell8,
-        Novice,
-        CustomEmotes,
-        StandardEmotes,
+        NoviceNetwork,
+        CustomEmote,
+        StandardEmote,
         Echo,
         SystemError,
         SystemMessage,
         ErrorMessage,
         GatheringSystemMessage,
-        NPCDialogueAnnouncements,
+        #[serde(rename = "npcDialogue")]
+        NPCDialogue,
         RetainerSale,
     }
 
@@ -375,15 +390,15 @@ pub mod models {
                 ChatType::CrossLinkShell6 => "CWLS6",
                 ChatType::CrossLinkShell7 => "CWLS7",
                 ChatType::CrossLinkShell8 => "CWLS8",
-                ChatType::Novice => "NN",
-                ChatType::CustomEmotes => "CEmote",
-                ChatType::StandardEmotes => "Emote",
+                ChatType::NoviceNetwork => "NN",
+                ChatType::CustomEmote => "CEmote",
+                ChatType::StandardEmote => "Emote",
                 ChatType::Echo => "Echo",
                 ChatType::SystemError => "Error(System)",
                 ChatType::SystemMessage => "System",
                 ChatType::ErrorMessage => "Error",
                 ChatType::GatheringSystemMessage => "Gathering",
-                ChatType::NPCDialogueAnnouncements => "NPC",
+                ChatType::NPCDialogue => "NPC",
                 ChatType::RetainerSale => "Retainer",
             };
             write!(f, "{str}")

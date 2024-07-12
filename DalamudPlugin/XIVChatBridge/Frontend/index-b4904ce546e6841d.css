@@ -58,27 +58,26 @@ div.chatBox > div.chatBoxContent {
   flex-direction: column-reverse;
 }
 div.chatBox > div.chatBoxContent > div.chatEntry {
-  display: flex;
-  flex-direction: row;
+  display: block;
 }
 div.chatBox > div.chatBoxContent > div.chatEntry > div.timestamp {
   color: white;
   min-width: fit-content;
   margin-right: 0.25rem;
-  flex: 0;
+  float: inline-start;
 }
 div.chatBox > div.chatBoxContent > div.chatEntry > div.chatType {
   min-width: fit-content;
   margin-right: 0.25rem;
-  flex: 0;
+  float: inline-start;
 }
 div.chatBox > div.chatBoxContent > div.chatEntry > div.sender {
   min-width: fit-content;
   margin-right: 0.5rem;
-  flex: 0;
+  float: inline-start;
 }
-div.chatBox > div.chatBoxContent > div.chatEntry > div.chatMessage {
-  flex-grow: 1;
+div.chatBox > div.chatBoxContent > div.chatEntry > span.chatMessage {
+  word-wrap: break-word;
 }
 div.chatBox > div.chatBoxHeader {
   display: block;
