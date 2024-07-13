@@ -3,6 +3,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Hooking;
 using Dalamud.Utility.Signatures;
 using FFXIVClientStructs.FFXIV.Client.Graphics;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
@@ -82,8 +83,7 @@ namespace XIVChatBridge {
 
         internal void SendMessage(string message, InputChannel channel)
         {
-            Plugin.Logger.Debug("message for channel: {0}. current channel: {1}", channel, currentChannel);
-            if (currentChannel != channel)
+            if (currentChannel != channel && !message.StartsWith('/'))
             {
                 message = channel.CommandPrefix() + " " + message;
             }

@@ -43,7 +43,6 @@ public sealed class Plugin : IDalamudPlugin
 
     HttpListener listener = new HttpListener();
     private Task? httpServerTask { get; set; }
-    //private CancellationTokenSource? cancellationTokenSource;
 
     private DirectoryInfo? frontendDir = null;
 
@@ -67,7 +66,7 @@ public sealed class Plugin : IDalamudPlugin
 
         // This adds a button to the plugin installer entry of this plugin which allows
         // to toggle the display status of the configuration ui
-        PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI; 
+        PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUI;
         PluginInterface.UiBuilder.OpenMainUi += ToggleMainUI;
 
         ChatGui.ChatMessage += OnChatMessage;
@@ -77,15 +76,14 @@ public sealed class Plugin : IDalamudPlugin
 
     private void Load()
     {
-        //listener = new HttpListener();
-        //cancellationTokenSource = new CancellationTokenSource();
         httpServerTask = handleIncomingConnections(Configuration.Port, Configuration.AllowNonLocalAccess)
             .ContinueWith(task =>
             {
                 if (!task.IsCanceled && task.Exception != null)
                 {
                     Logger.Error("exception on server: {0}", task.Exception);
-                } else 
+                }
+                else
                 {
                     var _ignore = task.Exception;
                 }
@@ -97,32 +95,12 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Reload()
     {
-        //cancellationTokenSource?.Cancel();
-
-        //try
-        //{
-        //    httpServerTask?.Wait();
-        //    httpServerTask?.Dispose();
-        //    listener?.Close();
-        //}
-        //catch (AggregateException ex)
-        //{
-        //    if (ex.InnerException != null)
-        //    {
-        //        if (!(ex.InnerException is TaskCanceledException))
-        //        {
-        //            Logger.Error("HTTP Server threw Exception: {0}", ex.InnerException);
-        //        }
-        //    }
-        //}
-        //cancellationTokenSource?.Dispose();
         stopListening();
         Load();
     }
 
     public void Dispose()
     {
-        //cancellationTokenSource?.Cancel();
         WindowSystem.RemoveAllWindows();
 
         ConfigWindow.Dispose();
@@ -131,23 +109,7 @@ public sealed class Plugin : IDalamudPlugin
 
         stopListening();
         listener?.Close();
-        //try
-        //{
-        //    httpServerTask?.Wait();
-        //    httpServerTask?.Dispose();
-        //    listener?.Close();
-        //}
-        //catch (AggregateException ex)
-        //{
-        //    if (ex.InnerException != null)
-        //    {
-        //        if (!(ex.InnerException is TaskCanceledException))
-        //        {
-        //            Logger.Error("HTTP Server threw Exception: {0}", ex.InnerException);
-        //        }
-        //    }
-        //}
-        //cancellationTokenSource?.Dispose();
+
         Functions.Dispose();
     }
 
@@ -203,7 +165,8 @@ public sealed class Plugin : IDalamudPlugin
         if (listenOnAll)
         {
             listener.Prefixes.Add("http://+:" + port.ToString() + "/");
-        } else
+        }
+        else
         {
             listener.Prefixes.Add("http://localhost:" + port.ToString() + "/");
             listener.Prefixes.Add("http://127.0.0.1:" + port.ToString() + "/");
@@ -211,7 +174,7 @@ public sealed class Plugin : IDalamudPlugin
 
         listener.Start();
         Logger.Debug("Server started");
-        //CancellationToken token = (CancellationToken)cancelToken;
+
         while (listener.IsListening)
         {
             try
@@ -382,15 +345,19 @@ public sealed class Plugin : IDalamudPlugin
 
         resp.ContentLength64 = file.Length;
 
-        if (path.EndsWith(".js")) {
+        if (path.EndsWith(".js"))
+        {
             resp.ContentType = "text/javascript";
-        } else if (path.EndsWith(".wasm"))
+        }
+        else if (path.EndsWith(".wasm"))
         {
             resp.ContentType = "application/wasm";
-        } else if (path.EndsWith(".css"))
+        }
+        else if (path.EndsWith(".css"))
         {
             resp.ContentType = "text/css";
-        } else if (path.EndsWith(".html"))
+        }
+        else if (path.EndsWith(".html"))
         {
             resp.ContentType = "text/html";
         }
