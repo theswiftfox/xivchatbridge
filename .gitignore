@@ -4,3 +4,4 @@ bin/
 *.user
 target/
 dist/
+*:Zone.Identifier
