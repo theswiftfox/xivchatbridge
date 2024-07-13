@@ -63,7 +63,7 @@ namespace XIVChatBridge
         {
             if (file.Exists)
             {
-                return file.OpenWrite();
+                file.Delete();
             }
             return file.Create();
         }

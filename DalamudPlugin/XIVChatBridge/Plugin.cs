@@ -214,7 +214,7 @@ public sealed class Plugin : IDalamudPlugin
         }
 
         listener.Start();
-        Logger.Debug("Server started");
+        Logger.Debug("Server started on: {0}", listener.Prefixes);
 
         while (listener.IsListening)
         {
