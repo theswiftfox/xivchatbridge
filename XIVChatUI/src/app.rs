@@ -63,6 +63,7 @@ impl Component for App {
         let cb = self.cb.clone();
         html! {
             <>
+            <div class="content">
                 <h1>{ "XIV Chat Bridge" }</h1>
                 <div class="chatBox">
                     <ChatBoxComponent />
@@ -104,9 +105,10 @@ impl Component for App {
                         <button type="submit">{ "Send" }</button>
                     </form>
                 </div>
-                <footer>
-                    { "Made by Elena" }
-                </footer>
+            </div>
+            <footer>
+                { "Made by Elena" }
+            </footer>
             </>
         }
     }
@@ -307,7 +309,11 @@ pub mod models {
         GatheringSystemMessage,
         #[serde(rename = "npcDialogue")]
         NPCDialogue,
+        #[serde(rename = "npcDialogueAnnouncements")]
+        NPCDialogueAnnouncements,
         RetainerSale,
+        #[serde(untagged)]
+        Unimplemented(String),
     }
 
     #[derive(Deserialize, Hash)]
@@ -401,10 +407,14 @@ pub mod models {
                 ChatType::SystemMessage => "System",
                 ChatType::ErrorMessage => "Error",
                 ChatType::GatheringSystemMessage => "Gathering",
-                ChatType::NPCDialogue => "NPC",
+                ChatType::NPCDialogue | ChatType::NPCDialogueAnnouncements => "NPC",
                 ChatType::RetainerSale => "Retainer",
+                ChatType::Unimplemented(val) => {
+                    log::warn!("Unknown chatType: {val}");
+                    "Unknown"
+                }
             };
-            write!(f, "{str}")
+            write!(f, "{str}",)
         }
     }
 
@@ -421,6 +431,7 @@ pub mod models {
                 Self::NoviceNetwork => "#cfe05c",
                 ls if (Self::LinkShell1..=Self::LinkShell8).contains(ls) => "#fad2b9",
                 Self::StandardEmote | Self::CustomEmote => "#e1faf9",
+                Self::NPCDialogue | Self::NPCDialogueAnnouncements => "#6ead10",
                 _ => "#FFFFFFFF",
             }
             .to_owned()

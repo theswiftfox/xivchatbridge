@@ -1,22 +1,47 @@
 html,
 body {
-  height: 99%;
+  height: 100%;
   margin: 0;
   background: linear-gradient(to bottom right, #444444, #17181b);
 
 }
 
+@media (max-width: 623px) {
+  html {
+    font-size: 0.7rem;
+  }
+}
+
+@media (min-width: 624px) {
+  html {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 702px) {
+  html {
+    font-size: 1rem;
+  }
+}
+
+@media (min-width: 780px) {
+  html {
+    font-size: 1.1rem;
+  }
+}
+
+@media (min-width: 858px) {
+  html {
+    font-size: 1.25rem;
+  }
+}
+
 body {
-  padding: 0.5rem;
-
   display: flex;
-
-  justify-content: center;
-  align-items: center;
 
   flex-direction: column;
 
-  font-size: 1.25rem;
+  // font-size: 1.25rem;
   font-family: system-ui;
 }
 
@@ -25,10 +50,7 @@ h1 {
 }
 
 footer {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  z-index: 10;
+  margin-left: auto;
   padding: 0.5rem;
   font-size: 1rem;
   color: #e6e6e63a;
@@ -46,13 +68,12 @@ button {
 div.chatBox {
   width: 100%;
   max-width: 1000px;
-  min-height: 80%;
-  max-height: 80%;
+  height: 1%;
+
   margin-bottom: 1rem;
-  flex: 0;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
-  // flex-direction: column-reverse;
 
   >div.chatBoxContent {
     border: 2px solid;
@@ -66,32 +87,27 @@ div.chatBox {
 
     >div.chatEntry {
       display: block;
-      // flex-direction: row;
 
       >div.timestamp {
         color: #FFFFFFFF;
         min-width: fit-content;
         margin-right: 0.25rem;
-        // flex: 0;
         float: inline-start;
       }
 
       >div.chatType {
         min-width: fit-content;
         margin-right: 0.25rem;
-        // flex: 0;
         float: inline-start;
       }
 
       >div.sender {
         min-width: fit-content;
         margin-right: 0.5rem;
-        // flex: 0;
         float: inline-start;
       }
 
       >span.chatMessage {
-        // flex-grow: 1;
         word-wrap: break-word;
       }
     }
@@ -105,27 +121,35 @@ div.chatBox {
 
     >div.manualRefresh {
       float: left;
-      // align-self: flex-start;
-      // flex: 0;
     }
 
     >div.refreshSettings {
       margin-right: 0.25rem;
       margin-top: 0.25rem;
       color: #e6e6e6;
-      // align-self: flex-end;
-      // flex-grow: 1;
       min-width: fit-content;
       float: right;
     }
   }
 }
 
+div.content {
+  padding: 0.5rem;
+  display: flex;
+  flex-grow: 0;
+
+  justify-content: center;
+  align-items: center;
+
+  flex-direction: column;
+  overflow: hidden;
+}
+
 div.chatInput {
   width: 100%;
   max-width: 1000px;
   display: inline-block;
-
+  flex-grow: 0;
 
   >form {
     width: 100%;
