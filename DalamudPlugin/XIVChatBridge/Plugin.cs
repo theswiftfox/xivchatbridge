@@ -40,6 +40,7 @@ public sealed class Plugin : IDalamudPlugin
     public readonly WindowSystem WindowSystem = new("XIV Chat Bridge");
     private ConfigWindow ConfigWindow { get; init; }
     private MainWindow MainWindow { get; init; }
+    private ChannelSelection ChannelSelection { get; init; }
 
     internal GameFunctions Functions { get; }
 
@@ -58,13 +59,15 @@ public sealed class Plugin : IDalamudPlugin
 
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
+        ChannelSelection = new ChannelSelection(this);
 
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
+        WindowSystem.AddWindow(ChannelSelection);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "A useful message to display in /xlhelp"
+            HelpMessage = "Toggle main window for XIVChatBridge"
         });
 
         PluginInterface.UiBuilder.Draw += DrawUI;
@@ -187,9 +190,11 @@ public sealed class Plugin : IDalamudPlugin
 
     public void ToggleMainUI() => MainWindow.Toggle();
 
+    public void ToggleChannelSelection() => ChannelSelection.Toggle();
+
     private void OnChatMessage(XivChatType type, int timestamp, ref SeString sender, ref SeString message, ref bool isHandled)
     {
-        if (!Enum.IsDefined(typeof(XivChatType), type) || isHandled || message == null) return;
+        if (!Enum.IsDefined(typeof(XivChatType), type) || isHandled || message == null || !Configuration.enabledChatTypes.Contains(type)) return;
 
         var text = message.TextValue;
         if (text == null) return;
