@@ -13,6 +13,9 @@ public class Configuration : IPluginConfiguration
 
     public bool AllowNonLocalAccess = false;
 
+    public int MessageLimit { get; set; } = 5000;
+    public bool PersistMessages = true;
+
     // the below exist just to make saving less cumbersome
     public void Save()
     {

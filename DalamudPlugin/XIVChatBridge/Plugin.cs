@@ -16,6 +16,9 @@ using System.Text.Json.Serialization;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Linq;
+using Lumina.Excel.GeneratedSheets;
+using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace XIVChatBridge;
 
@@ -29,6 +32,8 @@ public sealed class Plugin : IDalamudPlugin
     [PluginService] internal static IGameInteropProvider GameInteropProvider { get; private set; } = null!;
 
     private const string CommandName = "/xivchat";
+
+    private const string messageStoreName = "storage.json";
 
     public Configuration Configuration { get; init; }
 
@@ -71,6 +76,32 @@ public sealed class Plugin : IDalamudPlugin
 
         ChatGui.ChatMessage += OnChatMessage;
 
+        if (Configuration.PersistMessages)
+        {
+            var storagePath = getMessageStore();
+            if (storagePath != null)
+            {
+                List<ChatMessage>? stored = null;
+                try
+                {
+                    stored = ChatMessageSerializer.deserialize(storagePath);
+                }
+                catch (JsonException ex)
+                {
+                    Logger.Error("Failed to read message store: {0}", ex.Message);
+                }
+
+                if (stored != null && stored.Count > 0)
+                {
+                    messages = new ConcurrentQueue<ChatMessage>(stored);
+                }
+            }
+            else
+            {
+                Logger.Warning("Unable to get storage path for message persistence");
+            }
+        }
+
         Load();
     }
 
@@ -101,6 +132,16 @@ public sealed class Plugin : IDalamudPlugin
 
     public void Dispose()
     {
+        if (Configuration.PersistMessages)
+        {
+            var storagePath = getMessageStore();
+            if (storagePath != null) {
+                ChatMessageSerializer.serialize(messages.ToList(), storagePath);
+            } else
+            {
+                Logger.Warning("Unable to get storage path for message persistence");
+            }
+        }
         WindowSystem.RemoveAllWindows();
 
         ConfigWindow.Dispose();
@@ -158,7 +199,7 @@ public sealed class Plugin : IDalamudPlugin
         addMessage(chatMsg);
     }
 
-
+    #region HttpServer
     private async Task handleIncomingConnections(int port, bool listenOnAll)
     {
         if (listener == null) return;
@@ -382,10 +423,11 @@ public sealed class Plugin : IDalamudPlugin
         resp.Headers.Add("Allow: OPTIONS, GET");
         resp.Close();
     }
+    #endregion
 
     private void addMessage(ChatMessage msg)
     {
-        if (messages.Count >= 200) // todo configurable
+        if (messages.Count >= Configuration.MessageLimit) 
         {
             _ = messages.TryDequeue(out _); // just ignore for now.
         }
@@ -395,5 +437,14 @@ public sealed class Plugin : IDalamudPlugin
     private DirectoryInfo? getWorkingDir()
     {
         return PluginInterface.AssemblyLocation?.Directory;
+    }
+
+    private FileInfo? getMessageStore()
+    {
+        var configDir = PluginInterface.ConfigDirectory;
+        if (configDir == null) return null;
+
+        var file = new FileInfo(Path.Combine(configDir.FullName, messageStoreName));
+        return file;
     }
 }

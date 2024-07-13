@@ -14,11 +14,11 @@ namespace XIVChatBridge.Windows
 
         public MainWindow(Plugin plugin) : base("XIVChatBridge#MainWIndow", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
         {
-            SizeConstraints = new WindowSizeConstraints
-            {
-                MinimumSize = new Vector2(375, 330),
-                MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
-            };
+            Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoScrollWithMouse;
+
+            Size = new Vector2(260, 150);
+
             Plugin = plugin;
         }
 
@@ -26,15 +26,30 @@ namespace XIVChatBridge.Windows
 
         public override void Draw()
         {
-            ImGui.Text($"Server is running on http://localhost:{Plugin.Configuration.Port}/");
+            var url = $"http://localhost:{Plugin.Configuration.Port}";
 
+            ImGui.Text($"Server is running on {url}/");
+
+            ImGui.Spacing();
+
+            var label = "Open UI";
+            ImGuiHelper.Center(label);
+            if (ImGui.Button(label))
+            {
+                System.Diagnostics.Process.Start("explorer", url);
+            }
+
+            ImGui.Dummy(new Vector2(0, 30));
+
+            var label1 = "Show Settings";
+            var label2 = "Show Settings";
+
+            ImGuiHelper.Center(label1, label2);
             if (ImGui.Button("Show Settings"))
             {
                 Plugin.ToggleConfigUI();
             }
-
-            ImGui.Spacing();
-
+            ImGui.SameLine();
             if (ImGui.Button("Reload Plugin"))
             {
                 Plugin.Reload();
