@@ -8,13 +8,9 @@ use wasm_bindgen::JsCast;
 use web_sys::{FormData, HtmlFormElement, HtmlInputElement};
 use yew::prelude::*;
 
-pub enum FetchState<T, E> {
-    Success(T),
-    Error(E),
-}
-
 pub enum Msg {
-    SetFetchState(FetchState<Vec<ChatMessage>, String>),
+    Nothing,
+    SetFetchState(Result<Vec<ChatMessage>, ErrorMessage>),
     GetMessages,
     SubmitMessage(Result<NewMessageRequest, String>),
     ToggleRefresh,
@@ -30,8 +26,15 @@ pub struct State {
 
 pub struct ChatBoxComponent {
     state: State,
-    messages: FetchState<Vec<ChatMessage>, String>,
+    messages: Vec<ChatMessage>,
+    fetch_error: Option<ErrorMessage>,
     fetch_queued: AtomicBool,
+}
+
+#[derive(Clone)]
+pub struct ErrorMessage {
+    description: String,
+    details: Option<String>,
 }
 
 #[derive(Properties, PartialEq)]
@@ -132,13 +135,15 @@ impl Component for ChatBoxComponent {
             state: State {
                 refresh_enabled: true,
             },
-            messages: FetchState::Success(Vec::new()),
+            messages: Vec::new(),
+            fetch_error: None,
             fetch_queued: AtomicBool::new(true),
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
+            Msg::Nothing => false,
             Msg::ToggleRefresh => {
                 self.state.refresh_enabled = !self.state.refresh_enabled;
                 if self.state.refresh_enabled && !self.fetch_queued.load(Ordering::Relaxed) {
@@ -152,7 +157,14 @@ impl Component for ChatBoxComponent {
                 false
             }
             Msg::SetFetchState(state) => {
-                self.messages = state;
+                match state {
+                    Ok(messages) => {
+                        self.fetch_error = None;
+                        self.messages = messages
+                    }
+                    Err(e) => self.fetch_error = Some(e),
+                }
+
                 if self.state.refresh_enabled && !self.fetch_queued.load(Ordering::Relaxed) {
                     self.fetch_queued.store(true, Ordering::Relaxed);
                     ctx.link().send_future(async move {
@@ -165,12 +177,8 @@ impl Component for ChatBoxComponent {
             }
             Msg::GetMessages => {
                 self.fetch_queued.store(false, Ordering::Relaxed);
-                ctx.link().send_future(async {
-                    match get_messages().await {
-                        Ok(messages) => Msg::SetFetchState(FetchState::Success(messages)),
-                        Err(e) => Msg::SetFetchState(FetchState::Error(e)),
-                    }
-                });
+                ctx.link()
+                    .send_future(async { Msg::SetFetchState(get_messages().await) });
                 false
             }
             Msg::SubmitMessage(msg) => {
@@ -184,7 +192,7 @@ impl Component for ChatBoxComponent {
                                         .await;
                                     Msg::GetMessages
                                 }
-                                Err(e) => Msg::SetFetchState(FetchState::Error(e)),
+                                Err(e) => Msg::SetFetchState(Err(e)),
                             }
                         });
                     }
@@ -198,9 +206,26 @@ impl Component for ChatBoxComponent {
     fn view(&self, ctx: &Context<Self>) -> Html {
         html! {
         <>
+        if let Some(err) = self.fetch_error.clone() {
+            <div class="errorReport">
+                <span class="errorMessage">{ err.description.clone() }</span>
+                <button type="button" title="Copy details" onclick={ctx.link().callback(move |_| {
+                    if let Some(details) = &err.details {
+                        if let Some(clipboard) = web_sys::window()
+                            .and_then(|w| w.navigator().clipboard()) {
+                                let _ = clipboard.write_text(details);
+                            }
+                        }
+                        Msg::Nothing
+                    }
+                )
+
+                }>{ "📄" }</button>
+            </div>
+        }
         <div class="chatBoxHeader">
             <div class="manualRefresh">
-                <button onclick={ctx.link().callback(|_| Msg::GetMessages)} style="width: fit-content; align-self: center;">
+                <button type="button" onclick={ctx.link().callback(|_| Msg::GetMessages)} style="width: fit-content; align-self: center;">
                             { "Refresh" }
                             </button>
             </div>
@@ -211,38 +236,29 @@ impl Component for ChatBoxComponent {
         </div>
         <div class="chatBoxContent">
             {
-                match &self.messages {
-                    FetchState::Success(messages) => {
-                        html! {
-                            <>
-                            {
-                                messages.iter()
-                                    .rev()
-                                    .map(|msg| {
-                                        let color = msg.chat_type.get_color();
-                                        let uniq = format!("{}_{}", msg.timestamp, msg.sender_name);
-                                        // todo: wrap message to next line. probably have div as float with wrapping and text set to fit content or smth?
-                                        html!{
-                                            <>
-                                                <div key={uniq} class="chatEntry">
-                                                    <div class="timestamp"> { format!("[{}]", msg.formatted_timestamp()) } </div>
-                                                    <div class="chatType" style= { format!("color: {color}") }> { format!("[{}]", msg.chat_type) } </div>
-                                                    if !msg.sender_name.is_empty() { <div class="sender" style= { format!("color: {color}") }> { format!("{}:", msg.sender_name) } </div> }
-                                                    <span class="chatMessage" style= { format!("color: {color}") }>{ format!("{text}", text = msg.text) } </span>
-                                                </div>
-                                            </>
-                                        }
-                                    })
-                                    .collect::<Html>()
-                            }
-                            </>
-                        }
+                html! {
+                    <>
+                    {
+                        self.messages.iter()
+                            .rev()
+                            .map(|msg| {
+                                let color = msg.chat_type.get_color();
+                                let uniq = format!("{}_{}", msg.timestamp, msg.sender_name);
+                                // todo: wrap message to next line. probably have div as float with wrapping and text set to fit content or smth?
+                                html!{
+                                    <>
+                                        <div key={uniq} class="chatEntry">
+                                            <div class="timestamp"> { format!("[{}]", msg.formatted_timestamp()) } </div>
+                                            <div class="chatType" style= { format!("color: {color}") }> { format!("[{}]", msg.chat_type) } </div>
+                                            if !msg.sender_name.is_empty() { <div class="sender" style= { format!("color: {color}") }> { format!("{}:", msg.sender_name) } </div> }
+                                            <span class="chatMessage" style= { format!("color: {color}") }>{ format!("{text}", text = msg.text) } </span>
+                                        </div>
+                                    </>
+                                }
+                            })
+                            .collect::<Html>()
                     }
-                    FetchState::Error(e) => html! {
-                        <>
-                            <p>{ format!("{e}") }</p>
-                        </>
-                    },
+                    </>
                 }
             }
         </div>
@@ -450,9 +466,14 @@ pub mod models {
 }
 
 pub mod requests {
+    use std::error::Error;
+
     use serde::de;
 
-    use super::models::{ChatMessage, NewMessageRequest};
+    use super::{
+        models::{ChatMessage, NewMessageRequest},
+        ErrorMessage,
+    };
 
     lazy_static::lazy_static!(
         static ref CLIENT: reqwest_wasm::Client = {
@@ -471,66 +492,99 @@ pub mod requests {
     const FALLBACK_URL: &str = "http://localhost:9876";
     const MESSAGES_URI: &str = "/messages";
 
-    pub async fn get_messages() -> Result<Vec<ChatMessage>, String> {
+    pub async fn get_messages() -> Result<Vec<ChatMessage>, ErrorMessage> {
         let response = CLIENT
             .clone()
             .get(url(MESSAGES_URI)?)
             .send()
             .await
-            .map_err(|e| format!("get failed: {e}"))?;
+            .map_err(|e| {
+                log::error!(
+                    "{:?} failed. Caused By: {}",
+                    e.url(),
+                    e.source().map_or_else(|| String::new(), |s| s.to_string())
+                );
+                ErrorMessage {
+                    description: "Unable to get messages from Server. Make sure it is running!"
+                        .to_owned(),
+                    details: e.source().map(|source| source.to_string()),
+                }
+            })?;
         from_response::<Vec<ChatMessage>>(response).await
     }
 
-    pub async fn send_message(msg: &NewMessageRequest) -> Result<(), String> {
+    pub async fn send_message(msg: &NewMessageRequest) -> Result<(), ErrorMessage> {
         let response = CLIENT
             .clone()
             .post(url(MESSAGES_URI)?)
             .json(msg)
             .send()
             .await
-            .map_err(|e| format!("post failed: {e}"))?;
+            .map_err(|e| {
+                log::error!(
+                    "{:?} failed. Caused By: {}",
+                    e.url(),
+                    e.source().map_or_else(|| String::new(), |s| s.to_string())
+                );
+                ErrorMessage {
+                    description: "Unable to send message to Server. Make sure it is running!"
+                        .to_owned(),
+                    details: e.source().map(|source| source.to_string()),
+                }
+            })?;
 
         match response.status().as_u16() {
             200..=299 => Ok(()),
-            400 => Err(format!(
-                "Bad request: {}",
-                response.text().await.unwrap_or_else(|_| String::new())
-            )),
-            unknown_code => Err(format!("unexpected response: {}", unknown_code)),
+            400 => Err(ErrorMessage {
+                description: format!(
+                    "Bad request: {}",
+                    response.text().await.unwrap_or_else(|_| String::new())
+                ),
+                details: None,
+            }),
+            unknown_code => Err(ErrorMessage {
+                description: format!("unexpected response: {}", unknown_code),
+                details: None,
+            }),
         }
     }
 
-    async fn from_response<T>(value: reqwest_wasm::Response) -> Result<T, String>
+    async fn from_response<T>(value: reqwest_wasm::Response) -> Result<T, ErrorMessage>
     where
         T: de::DeserializeOwned,
     {
         match value.status().as_u16() {
             200..=299 => {}
             _ => {
-                return Err(format!(
-                    "HTTP Error => {error_code}: {error_msg}",
-                    error_code = value.status(),
-                    error_msg = value.text().await.unwrap_or_else(|_| String::new()),
-                ))
+                return Err(ErrorMessage {
+                    description: format!("HTTP Error: {error_code}", error_code = value.status()),
+                    details: value.text().await.ok(),
+                })
             }
         }
 
-        let bytes = value
-            .text()
-            .await
-            .map_err(|e| format!("Unable to read response: {e}"))?;
+        let bytes = value.text().await.map_err(|e| ErrorMessage {
+            description: "Unable to read response".to_owned(),
+            details: Some(e.to_string()),
+        })?;
 
-        serde_json::from_str(&bytes).map_err(|e| format!("JSON parsing failed: {e}"))
+        serde_json::from_str(&bytes).map_err(|e| ErrorMessage {
+            description: "JSON parsing failed".to_owned(),
+            details: Some(e.to_string()),
+        })
     }
 
     #[cfg(feature = "devtest")]
-    fn url(uri: &str) -> Result<reqwest_wasm::Url, String> {
+    fn url(uri: &str) -> Result<reqwest_wasm::Url, ErrorMessage> {
         let url = format!("{FALLBACK_URL}{uri}");
-        reqwest_wasm::Url::parse(&url).map_err(|e| format!("Unable to parse URL: {e}"))
+        reqwest_wasm::Url::parse(&url).map_err(|e| ErrorMessage {
+            description: "Unable to parse URL".to_owned(),
+            details: Some(e.to_string()),
+        })
     }
 
     #[cfg(not(feature = "devtest"))]
-    fn url(uri: &str) -> Result<reqwest_wasm::Url, String> {
+    fn url(uri: &str) -> Result<reqwest_wasm::Url, ErrorMessage> {
         let url = format!(
             "{}{uri}",
             web_sys::window()
@@ -548,6 +602,9 @@ pub mod requests {
                 })
         );
 
-        reqwest_wasm::Url::parse(&url).map_err(|e| format!("Unable to parse URL: {e}"))
+        reqwest_wasm::Url::parse(&url).map_err(|e| ErrorMessage {
+            description: "Unable to parse URL".to_owned(),
+            details: Some(e.to_string()),
+        })
     }
 }

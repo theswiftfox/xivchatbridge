@@ -65,6 +65,24 @@ button {
   border-color: #ffffff57;
 }
 
+button:active {
+  background-color: #e6e6e6;
+  color: #000000;
+}
+
+div.errorReport {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+
+  >span.errorMessage {
+    color: #bb1e1e;
+    margin-right: 0.5rem;
+  }
+
+  margin-bottom: 1rem;
+}
+
 div.chatBox {
   width: 100%;
   max-width: 1000px;
@@ -137,6 +155,7 @@ div.content {
   padding: 0.5rem;
   display: flex;
   flex-grow: 0;
+  height: 100%;
 
   justify-content: center;
   align-items: center;
