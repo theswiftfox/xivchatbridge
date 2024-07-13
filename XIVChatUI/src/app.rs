@@ -234,7 +234,7 @@ impl Component for ChatBoxComponent {
                 <label for="refresh">{ "Auto Refresh" }</label>
             </div>
         </div>
-        <div class="chatBoxContent">
+        <div class="chatBoxContent" id="chatBoxContent">
             {
                 html! {
                     <>

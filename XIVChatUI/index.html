@@ -8,6 +8,27 @@
   <title>XIV Chat</title>
   <link data-trunk rel="sass" href="index.scss" />
   <link data-trunk rel="rust" />
+  <script type="text/javascript">
+    // // sticky chat
+    var scrolledDown = true;
+    var hooked = false;
+
+    setInterval(function () {
+      const chatbox = document.getElementById("chatBoxContent");
+
+      if (!hooked) {
+        chatbox.onscroll = function (e) { onScrollEvent(e) }
+        hooked = true;
+      }
+
+      if (scrolledDown) {
+        chatbox.scrollTop = chatbox.scrollHeight - chatbox.clientHeight
+      }
+    }, 500)
+    function onScrollEvent(e) {
+      scrolledDown = e.target.scrollTop >= -50;
+    }
+  </script>
 </head>
 
 <body></body>
