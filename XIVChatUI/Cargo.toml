@@ -28,3 +28,7 @@ wasm-bindgen = "0.2"
 wasm-logger = "0.2"
 wasmtimer = "0.2"
 yew = { version = "0.20", features = ["csr"] }
+
+[features]
+default = []
+devtest = []

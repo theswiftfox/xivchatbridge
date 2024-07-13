@@ -93,7 +93,7 @@ impl Component for App {
                         }}>
                         <label for="chatType">{ "ChatType:" }</label>
                         <select name="chatType" id="chatType">
-                            <option value="Say">{ "Say" }</option>
+                            <option value="Say" selected=true >{ "Say" }</option>
                             <option value="Shout">{ "Shout" }</option>
                             <option value="Yell">{ "Yell" }</option>
                             <option value="Party">{ "Party" }</option>
@@ -266,7 +266,9 @@ pub mod models {
         Say,
         Shout,
         Yell,
-        Tell,
+        // syntax: /tell player name@world message
+        TellOutgoing,
+        TellIncoming,
         Party,
         FreeCompany,
         Alliance,
@@ -369,7 +371,8 @@ pub mod models {
                 ChatType::Say => "Say",
                 ChatType::Shout => "Shout",
                 ChatType::Yell => "Yell",
-                ChatType::Tell => "Tell",
+                ChatType::TellOutgoing => "Tell>",
+                ChatType::TellIncoming => "Tell<",
                 ChatType::Party => "Party",
                 ChatType::FreeCompany => "FC",
                 ChatType::Alliance => "Alliance",
@@ -408,9 +411,16 @@ pub mod models {
     impl ChatType {
         pub fn get_color(&self) -> String {
             match self {
+                Self::Yell => "#fcfc03",
+                Self::Shout => "#ffce63",
+                Self::TellIncoming | Self::TellOutgoing => "#f263ff",
+                Self::Alliance => "#ed9511",
                 Self::FreeCompany => "#4ef542",
                 Self::Party => "#426ff5",
                 cwl if (Self::CrossLinkShell1..=Self::CrossLinkShell8).contains(cwl) => "#9f3cbd",
+                Self::NoviceNetwork => "#cfe05c",
+                ls if (Self::LinkShell1..=Self::LinkShell8).contains(ls) => "#fad2b9",
+                Self::StandardEmote | Self::CustomEmote => "#e1faf9",
                 _ => "#FFFFFFFF",
             }
             .to_owned()
@@ -502,6 +512,13 @@ pub mod requests {
         serde_json::from_str(&bytes).map_err(|e| format!("JSON parsing failed: {e}"))
     }
 
+    #[cfg(feature = "devtest")]
+    fn url(uri: &str) -> Result<reqwest_wasm::Url, String> {
+        let url = format!("{FALLBACK_URL}{uri}");
+        reqwest_wasm::Url::parse(&url).map_err(|e| format!("Unable to parse URL: {e}"))
+    }
+
+    #[cfg(not(feature = "devtest"))]
     fn url(uri: &str) -> Result<reqwest_wasm::Url, String> {
         let url = format!(
             "{}{uri}",
@@ -519,7 +536,6 @@ pub mod requests {
                     FALLBACK_URL.to_owned()
                 })
         );
-        // let url = format!("{FALLBACK_URL}{uri}");
 
         reqwest_wasm::Url::parse(&url).map_err(|e| format!("Unable to parse URL: {e}"))
     }
