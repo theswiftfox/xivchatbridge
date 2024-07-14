@@ -6,6 +6,15 @@ body {
 
 }
 
+@font-face {
+  font-family: "xivfont";
+  src:
+    url("https://lds-img.finalfantasyxiv.com/pc/global/fonts/FFXIV_Lodestone_SSF.woff") format('woff'),
+    url("https://lds-img.finalfantasyxiv.com/pc/global/fonts/FFXIV_Lodestone_SSF.woff") format('truetype');
+  unicode-range: U+E020-E0DB;
+  size-adjust: 65%;
+}
+
 @media (max-width: 623px) {
   html {
     font-size: 0.7rem;
@@ -102,6 +111,7 @@ div.chatBox {
     flex-grow: 1;
     display: flex;
     flex-direction: column-reverse;
+    font-family: xivfont, system-ui;
 
     >div.chatEntry {
       display: block;
@@ -123,10 +133,6 @@ div.chatBox {
         min-width: fit-content;
         margin-right: 0.5rem;
         float: inline-start;
-      }
-
-      >span.chatMessage {
-        word-wrap: break-word;
       }
     }
   }
