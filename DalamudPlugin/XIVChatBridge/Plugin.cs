@@ -148,6 +148,8 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.RemoveAllWindows();
 
         ConfigWindow.Dispose();
+        MainWindow.Dispose();
+        ChannelSelection.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
 
