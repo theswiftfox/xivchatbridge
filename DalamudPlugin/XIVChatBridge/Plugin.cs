@@ -148,8 +148,6 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.RemoveAllWindows();
 
         ConfigWindow.Dispose();
-        MainWindow.Dispose();
-        ChannelSelection.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
 
@@ -204,6 +202,11 @@ public sealed class Plugin : IDalamudPlugin
         var chatMsg = new ChatMessage(type, sender.TextValue, message.TextValue);
 
         addMessage(chatMsg);
+    }
+
+    internal void ClearMessages()
+    {
+        messages.Clear();
     }
 
     #region HttpServer

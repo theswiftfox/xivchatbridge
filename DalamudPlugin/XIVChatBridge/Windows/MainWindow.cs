@@ -17,7 +17,7 @@ namespace XIVChatBridge.Windows
             Flags = ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoScrollWithMouse;
 
-            Size = new Vector2(260, 170);
+            Size = new Vector2(260, 200);
 
             Plugin = plugin;
         }
@@ -53,6 +53,14 @@ namespace XIVChatBridge.Windows
             if (ImGui.Button(label2))
             {
                 Plugin.ToggleChannelSelection();
+            }
+
+            ImGui.Spacing();
+            label1 = "Clear Chat history";
+            ImGuiHelper.Center(label1);
+            if (ImGui.Button(label1))
+            {
+                Plugin.ClearMessages();
             }
 
             ImGui.Dummy(new Vector2(0, 10));
