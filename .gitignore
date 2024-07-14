@@ -5,3 +5,5 @@ bin/
 target/
 dist/
 *:Zone.Identifier
+*.ttf
+*.woff

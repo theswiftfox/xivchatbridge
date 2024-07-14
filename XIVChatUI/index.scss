@@ -9,8 +9,8 @@ body {
 @font-face {
   font-family: "xivfont";
   src:
-    url("https://lds-img.finalfantasyxiv.com/pc/global/fonts/FFXIV_Lodestone_SSF.woff") format('woff'),
-    url("https://lds-img.finalfantasyxiv.com/pc/global/fonts/FFXIV_Lodestone_SSF.woff") format('truetype');
+    url("fonts/FFXIV_Lodestone_SSF.woff") format('woff'),
+    url("fonts/FFXIV_Lodestone_SSF.ttf") format('truetype');
   unicode-range: U+E020-E0DB;
   size-adjust: 65%;
 }

@@ -4,6 +4,11 @@
 
 FFXIV ChatBridge plugin for Dalamud. Allowing to access the chat from the browser.
 
+## How to build
+1. Build UI dist via trunk in XIVChatUI: `trunk build --release`  
+2. Copy everyting in `XIVChatUI/dist` to `DalamudPlugin/XIVChatBridge/Frontend`  
+3. Build Plugin using Visual Studio  
+
 ## How to access from other devices  
 ⚠️ Only do this if you know what you are doing. There is currently no authentication enabled.  
 
