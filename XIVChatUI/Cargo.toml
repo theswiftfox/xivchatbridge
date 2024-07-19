@@ -13,7 +13,11 @@ authors = ["Elena Gantner <elena.gantner@gmail.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [dependencies]
-chrono = { version = "0.4", default-features = false, features = ["std"] }
+chrono = { version = "0.4", default-features = false, features = [
+    "std",
+    "clock",
+    "wasmbind",
+] }
 lazy_static = "1.4"
 log = "0.4"
 reqwest-wasm = { version = "0.11", default-features = false, features = [

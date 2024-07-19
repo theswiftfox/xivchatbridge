@@ -457,7 +457,9 @@ pub mod models {
     impl ChatMessage {
         pub fn formatted_timestamp(&self) -> String {
             if let Ok(date_time) = self.timestamp.parse::<chrono::DateTime<chrono::Utc>>() {
-                date_time.format("%Y-%m-%d %H:%M").to_string()
+                chrono::DateTime::<chrono::Local>::from(date_time)
+                    .format("%Y-%m-%d %H:%M")
+                    .to_string()
             } else {
                 "N/A".to_owned()
             }
@@ -606,5 +608,26 @@ pub mod requests {
             description: "Unable to parse URL".to_owned(),
             details: Some(e.to_string()),
         })
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::models::{ChatMessage, ChatType};
+
+    const timestamp: &str = "2024-07-14T10:18:02.8379913+02:00";
+
+    #[test]
+    fn test_timestamp() {
+        let message = ChatMessage {
+            timestamp: timestamp.to_owned(),
+            chat_type: ChatType::Say,
+            sender_name: "none".to_owned(),
+            text: "test".to_owned(),
+        };
+
+        let formatted = message.formatted_timestamp();
+        println!("{formatted}");
+        assert_eq!(formatted, "2024-07-14 10:18")
     }
 }
