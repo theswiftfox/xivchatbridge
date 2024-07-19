@@ -12,14 +12,14 @@ namespace XIVChatBridge
 {
     internal class ChatMessage
     {
-        private DateTime timestamp = DateTime.Now;
-        public DateTime Timestamp { get {  return timestamp; } }
+        public DateTime Timestamp { get; }
         public XivChatType Type { get; }
         public string SenderName { get; }
         public string Text { get; }
 
-        public ChatMessage(XivChatType type, string SenderName, string Text)
+        public ChatMessage(XivChatType type, string SenderName, string Text, DateTime timestamp)
         {
+            this.Timestamp = timestamp;
             this.Type = type;
             this.SenderName = SenderName;
             this.Text = Text;

@@ -199,7 +199,7 @@ public sealed class Plugin : IDalamudPlugin
         var text = message.TextValue;
         if (text == null) return;
 
-        var chatMsg = new ChatMessage(type, sender.TextValue, message.TextValue);
+        var chatMsg = new ChatMessage(type, sender.TextValue, message.TextValue, DateTime.Now);
 
         addMessage(chatMsg);
     }
